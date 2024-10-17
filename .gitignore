@@ -3,6 +3,9 @@ ContextualBias/Data/
 mae/ckpt/
 mae/output_coco_finetune/
 mae/output_df_finetune/
+mae/output_awa_finetune/
 mae/output_dir/
+mae/__pycache__
+ContextualBias/__pycache__
 *.pkl
 ContextualBias/models/
