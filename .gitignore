@@ -1,0 +1,8 @@
+*.pth
+ContextualBias/Data/
+mae/ckpt/
+mae/output_coco_finetune/
+mae/output_df_finetune/
+mae/output_dir/
+*.pkl
+ContextualBias/models/
