@@ -33,13 +33,14 @@ class CocoStuffDataset(Dataset):
         return len(self.image_paths)
 
     def __getitem__(self, idx):
-        # print('hehe: ', self.image_paths[idx])
         image_path = '../ContextualBias/' + self.image_paths[idx]
         label = self.labels[idx]
         image = PIL.Image.open(image_path).convert('RGB')
         if self.transform:
             image = self.transform(image)
-        return image, torch.argmax(torch.tensor(label), dim=0)  # Convert one-hot to class index
+        # print('target shape: ', torch.tensor(label).shape)
+        # return image, torch.tensor(label), torch.argmax(torch.tensor(label), dim=0)  # Convert one-hot to class index
+        return image, torch.tensor(label)  # Convert one-hot to class index
 
 
 def build_dataset(is_train, args):

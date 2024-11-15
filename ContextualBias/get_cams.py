@@ -92,7 +92,8 @@ def main():
     classifier = multilabel_classifier(device=arg['device'], dtype=arg['dtype'], modelpath=arg['modelpath'])
     classifier.model = classifier.model.to(device=classifier.device, dtype=classifier.dtype)
 
-    classifier.model._modules['resnet'].layer4.register_forward_hook(hook_classifier_features)
+    classifier.model._modules['module'].layer4.register_forward_hook(hook_classifier_features)
+    # classifier.model._modules['resnet'].layer4.register_forward_hook(hook_classifier_features)
     classifier_params = list(classifier.model.parameters())
     classifier_softmax_weight = classifier_params[-2].squeeze(0)
 

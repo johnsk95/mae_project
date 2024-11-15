@@ -21,6 +21,8 @@ from timm.utils import accuracy
 import util.misc as misc
 import util.lr_sched as lr_sched
 
+from sklearn.metrics import average_precision_score, recall_score
+import numpy as np
 
 def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
                     data_loader: Iterable, optimizer: torch.optim.Optimizer,
@@ -48,13 +50,22 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
 
         samples = samples.to(device, non_blocking=True)
         targets = targets.to(device, non_blocking=True)
+        # print('samples before: ', samples.shape)
+        # print('targets_before: ', targets.shape)
 
-        if mixup_fn is not None:
-            samples, targets = mixup_fn(samples, targets)
+        # John - comment out for contextualbias
+        # if mixup_fn is not None:
+        #     samples, targets = mixup_fn(samples, targets)
 
+        # print('samples after: ', samples.shape)
         with torch.cuda.amp.autocast():
             outputs = model(samples)
-            loss = criterion(outputs, targets)
+            # loss = criterion(outputs, targets)
+            # for contextualbias
+            # print('outputs: ', outputs.shape)
+            # print('targets; ', targets.shape)
+            # print(targets)
+            loss = criterion(outputs.squeeze(), targets)
 
         loss_value = loss.item()
 
@@ -95,9 +106,46 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
     return {k: meter.global_avg for k, meter in metric_logger.meters.items()}
 
 
+# @torch.no_grad()
+# def evaluate(data_loader, model, device):
+#     criterion = torch.nn.CrossEntropyLoss()
+
+#     metric_logger = misc.MetricLogger(delimiter="  ")
+#     header = 'Test:'
+
+#     # switch to evaluation mode
+#     model.eval()
+
+#     for batch in metric_logger.log_every(data_loader, 10, header):
+#         images = batch[0]
+#         target = batch[-1]
+#         images = images.to(device, non_blocking=True)
+#         target = target.to(device, non_blocking=True)
+
+#         # compute output
+#         with torch.cuda.amp.autocast():
+#             output = model(images)
+#             loss = criterion(output, target)
+
+#         acc1, acc5 = accuracy(output, target, topk=(1, 5))
+
+#         batch_size = images.shape[0]
+#         metric_logger.update(loss=loss.item())
+#         metric_logger.meters['acc1'].update(acc1.item(), n=batch_size)
+#         metric_logger.meters['acc5'].update(acc5.item(), n=batch_size)
+#     # gather the stats from all processes
+#     metric_logger.synchronize_between_processes()
+#     print('* Acc@1 {top1.global_avg:.3f} Acc@5 {top5.global_avg:.3f} loss {losses.global_avg:.3f}'
+#           .format(top1=metric_logger.acc1, top5=metric_logger.acc5, losses=metric_logger.loss))
+
+#     return {k: meter.global_avg for k, meter in metric_logger.meters.items()}
+
+
+# modified to calculate mAP and recall
 @torch.no_grad()
 def evaluate(data_loader, model, device):
-    criterion = torch.nn.CrossEntropyLoss()
+    # criterion = torch.nn.CrossEntropyLoss()
+    criterion = torch.nn.BCEWithLogitsLoss()
 
     metric_logger = misc.MetricLogger(delimiter="  ")
     header = 'Test:'
@@ -105,26 +153,70 @@ def evaluate(data_loader, model, device):
     # switch to evaluation mode
     model.eval()
 
+    all_targets = []
+    all_outputs = []
+
+    all_targets_raw = []
+
     for batch in metric_logger.log_every(data_loader, 10, header):
         images = batch[0]
         target = batch[-1]
         images = images.to(device, non_blocking=True)
         target = target.to(device, non_blocking=True)
+        # target = target.to(device, non_blocking=True, dtype=torch.long)
+
+        # John: non-one-hot binary labels
+        target_raw = batch[1]
+        target_raw = target_raw.to(device, non_blocking=True)
 
         # compute output
         with torch.cuda.amp.autocast():
             output = model(images)
-            loss = criterion(output, target)
 
-        acc1, acc5 = accuracy(output, target, topk=(1, 5))
+            # print('outputs: ', output.shape)
+            # print('targets; ', target.shape)
+
+            # loss = criterion(output, target)
+            # for contextualbias
+            loss = criterion(output.squeeze(), target)
+
+        # output = model(images)
+
+        # print('outputs: ', output.shape)
+        # print('targets; ', target.shape)
+        
+        # # loss = criterion(output, target)
+        # # for contextualbias
+        # loss = criterion(output.squeeze(), target)
+
+        # acc1, acc5 = accuracy(output, target, topk=(1, 5))
 
         batch_size = images.shape[0]
         metric_logger.update(loss=loss.item())
-        metric_logger.meters['acc1'].update(acc1.item(), n=batch_size)
-        metric_logger.meters['acc5'].update(acc5.item(), n=batch_size)
+        # metric_logger.meters['acc1'].update(acc1.item(), n=batch_size)
+        # metric_logger.meters['acc5'].update(acc5.item(), n=batch_size)
+
+        all_targets.extend(target.cpu().numpy())
+        all_outputs.extend(torch.softmax(output, dim=1).cpu().numpy())
+
+        # all_targets_raw.extend(target_raw.cpu().numpy())
+
     # gather the stats from all processes
     metric_logger.synchronize_between_processes()
-    print('* Acc@1 {top1.global_avg:.3f} Acc@5 {top5.global_avg:.3f} loss {losses.global_avg:.3f}'
-          .format(top1=metric_logger.acc1, top5=metric_logger.acc5, losses=metric_logger.loss))
 
-    return {k: meter.global_avg for k, meter in metric_logger.meters.items()}
+    # Calculate mean average precision and top-3 recall
+    all_targets = np.array(all_targets)
+    all_targets_raw = np.array(all_targets_raw)
+    # print('targets shape: ', all_targets.shape) # targets shape:  (6985,)
+    all_outputs = np.array(all_outputs)
+    # print('output shape: ', all_outputs.shape) # output shape:  (6985, 85)
+    mean_ap = average_precision_score(all_targets, all_outputs, average='macro')
+    top3_preds = np.argsort(all_outputs, axis=1)[:, -3:]
+    top3_recall = np.mean([1 if target in preds else 0 for target, preds in zip(all_targets, top3_preds)])
+
+    print('* mAP {mean_ap:.3f} Top-3 Recall {top3_recall:.3f} loss {losses.global_avg:.3f}'
+          .format(mean_ap=mean_ap, top3_recall=top3_recall, losses=metric_logger.loss))
+    # print('* Acc@1 {top1.global_avg:.3f} Acc@5 {top5.global_avg:.3f} Top-3 Recall {top3_recall:.3f} loss {losses.global_avg:.3f}'
+    #       .format(top1=metric_logger.acc1, top5=metric_logger.acc5, top3_recall=top3_recall, losses=metric_logger.loss))
+
+    return {k: meter.global_avg for k, meter in metric_logger.meters.items()}, all_targets, all_outputs, all_targets_raw

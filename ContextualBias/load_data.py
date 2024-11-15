@@ -23,6 +23,8 @@ class Dataset(Dataset):
         X = self.transform(img)
         y = self.img_labels[ID]
 
+        # print('label shape; ', y.shape)
+
         return X, y, ID
 
 def create_dataset(dataset, labels_path, biased_classes_mapped, B=100, train=True, removeclabels=False, removecimages=False, removeximages=False, splitbiased=False):

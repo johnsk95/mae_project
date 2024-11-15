@@ -1,9 +1,9 @@
 #!/bin/sh
 
 # 1. Process datasets
-# python COCOStuff/data_process.py \
-#   --coco2014_images Data/Coco/2014data \
-#   --cocostuff_annotations Data/cocostuff/dataset/annotations
+python COCOStuff/data_process2.py \
+  --coco2014_images Data/Coco \
+  --cocostuff_annotations Data/cocostuff/annotations
 
 # python DeepFashion/data_process.py \
 #   --datadir Data/DeepFashion/Category\ and\ Attribute\ Prediction\ Benchmark
@@ -12,14 +12,14 @@
 
 # python UnRel/data_process.py --datadir Data/UnRel
 
-# python split_80_20.py --labels_train COCOStuff/labels_train.pkl \
-#   --labels_train_20 COCOStuff/labels_train_20.pkl --labels_train_80 COCOStuff/labels_train_80.pkl
+python split_80_20.py --labels_train COCOStuff/labels_train.pkl \
+  --labels_train_20 COCOStuff/labels_train_20.pkl --labels_train_80 COCOStuff/labels_train_80.pkl
 
 # python split_80_20.py --labels_train AwA/labels_train.pkl \
 #   --labels_train_20 AwA/labels_train_20.pkl --labels_train_80 AwA/labels_train_80.pkl
 
 # 2. Train a standard model
-python train.py --dataset COCOStuff --nclasses 171 --model standard --outdir models/COCOStuff \
+python train.py --dataset COCOStuff --nclasses 171 --model standard --outdir models/COCOStuff2 \
   --labels_train COCOStuff/labels_train_80.pkl --labels_val COCOStuff/labels_train_20.pkl \
   --nepoch 100 --lr 0.1 --drop 60 --wd 0 --momentum 0.9
 
@@ -34,7 +34,7 @@ python train.py --dataset AwA --nclasses 85 --model standard --outdir models/AwA
 # 3. Identify biased categories
 python biased_categories.py --dataset COCOStuff --nclasses 171 --cooccur 0.2 \
   --labels_20 COCOStuff/labels_train_20.pkl --labels_80 COCOStuff/labels_train_80.pkl \
-  --modelpath models/COCOStuff/standard/model_100.pth
+  --modelpath models/COCOStuff2/standard/model_100.pth
 
 python biased_categories.py --dataset DeepFashion --nclasses 250 --cooccur 0.1 \
   --labels_20 DeepFashion/labels_val.pkl --labels_80 DeepFashion/labels_train.pkl \
@@ -76,3 +76,15 @@ python get_prediction_examples.py --dataset COCOStuff --nclasses 171 \
 python get_cams.py --coco2014_images Data/Coco/2014data \
   --img_ids 535811 430054 554674 --outdir CAM_examples \
   --modelpath models/COCOStuff/cam/model_20.pth
+
+python get_cams.py --coco2014_images Data/Coco \
+  --img_ids 535811 430054 554674 --outdir CAM_examples \
+  --modelpath models/COCOStuff2/standard/model_100.pth
+
+python biased_categories.py --dataset COCOStuff --nclasses 171 --cooccur 0.2 \
+  --labels_20 COCOStuff/labels_train_20.pkl --labels_80 COCOStuff/labels_train_80.pkl \
+  --modelpath models/COCOStuff2/standard/model_100.pth
+
+python evaluate.py --dataset COCOStuff --nclasses 171 --model standard \
+  --modelpath models/COCOStuff2/standatd/model_100.pth \
+  --labels_test COCOStuff/labels_test.pkl

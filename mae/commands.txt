@@ -3,21 +3,21 @@ OMP_NUM_THREADS=1 python -m torch.distributed.launch --nproc_per_node=3 main_fin
     --batch_size 16 \
     --model vit_base_patch16 \
     --finetune ckpt/mae_pretrain_vit_base.pth \
-    --epochs 100 \
+    --epochs 100 --nb_classes 171 \
     --blr 5e-4 --layer_decay 0.65 \
     --weight_decay 0.05 --drop_path 0.1 --mixup 0.8 --cutmix 1.0 --reprob 0.25 \
     --dist_eval --data_path ../ContextualBias/COCOStuff --output_dir output_coco_finetune
 
 
-OMP_NUM_THREADS=1 python -m torch.distributed.launch --nproc_per_node=3 --master_port=40000 main_finetune_coco.py \
-    --accum_iter 1 \
+OMP_NUM_THREADS=1 python -m torch.distributed.launch --nproc_per_node=2 --master_port=40000 main_finetune_coco.py \
+    --accum_iter 4 \
     --batch_size 16 \
     --model vit_base_patch16 \
     --finetune ckpt/mae_pretrain_vit_base.pth \
     --epochs 100 --nb_classes 171 \
     --layer_decay 0.65 \
     --weight_decay 0.05 --drop_path 0.1 --mixup 0.8 --cutmix 1.0 --reprob 0.25 \
-    --dist_eval --data_path ../ContextualBias/COCOStuff --output_dir output_coco_finetune
+    --dist_eval --data_path ../ContextualBias/COCOStuff --output_dir output_coco_finetune_new
 
 
 
@@ -44,3 +44,25 @@ OMP_NUM_THREADS=1 python -m torch.distributed.launch --nproc_per_node=3 main_fin
 
 
 
+OMP_NUM_THREADS=1 python -m torch.distributed.launch --nproc_per_node=2 main_pretrain_coco.py \
+    --accum_iter 4 \
+    --batch_size 32 \
+    --model mae_vit_base_patch16 \
+    --norm_pix_loss \
+    --mask_ratio 0.75 \
+    --resume ckpt/mae_pretrain_vit_base.pth \
+    --epochs 100 \
+    --warmup_epochs 40 \
+    --blr 1.5e-4 --weight_decay 0.05 \
+    --data_path ../ContextualBias/COCOStuff
+
+    --nodes 8 \
+    --use_volta32 \
+    --batch_size 64 \
+    --model mae_vit_large_patch16 \
+    --norm_pix_loss \
+    --mask_ratio 0.75 \
+    --epochs 800 \
+    --warmup_epochs 40 \
+    --blr 1.5e-4 --weight_decay 0.05 \
+    --data_path ${IMAGENET_DIR}

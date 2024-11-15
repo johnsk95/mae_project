@@ -87,6 +87,11 @@ def main():
     cooccur_AP_list = []
     biased_classes_list = list(biased_classes_mapped.keys())
 
+    # print('label shape: ', labels_list.shape)
+    # print('scores shape: ', scores_list.shape)
+    # print('label shape: ', labels_list[0])
+    # print('scores shape: ', scores_list[0])
+
     for k in range(len(biased_classes_list)):
         b = biased_classes_list[k]
         c = biased_classes_mapped[b]
@@ -99,6 +104,7 @@ def main():
             cooccur = (labels_list[:,b]==1) & (labels_list[:,c]==1)
             exclusive = (labels_list[:,b]==1) & (labels_list[:,c]==0)
         other = (~exclusive) & (~cooccur)
+
 
         # Calculate AP for co-occur/exclusive sets
         if splitbiased:
@@ -116,6 +122,9 @@ def main():
             exclusive_AP = recall3(labels_list[exclusive+other, b], scores_list[exclusive+other], b)
         else:
             exclusive_AP = average_precision_score(labels_list[exclusive+other, b],scores_list[exclusive+other, b])
+
+        # print('co-occur: ', labels_list[cooccur+other, b].shape)
+        # print('exclusive: ', labels_list[exclusive+other, b].shape)
 
         # Record and print
         cooccur_AP_list.append(cooccur_AP)
