@@ -34,8 +34,10 @@ import models_mae
 
 from engine_pretrain import train_one_epoch
 
-from util.datasets_coco import build_dataset
+from util.datasets_coco_pretrain import build_dataset
+# from util.datasets_coco import build_dataset
 
+import pickle
 
 def get_args_parser():
     parser = argparse.ArgumentParser('MAE pre-training', add_help=False)
@@ -79,7 +81,7 @@ def get_args_parser():
     parser.add_argument('--data_path', default='../ContextualBias/COCOStuff', type=str,
                         help='dataset path')
 
-    parser.add_argument('--output_dir', default='./output_dir',
+    parser.add_argument('--output_dir', default='./pretrain_coco',
                         help='path where to save, empty for no saving')
     parser.add_argument('--log_dir', default='./pretrain_coco',
                         help='path where to tensorboard log')
@@ -156,7 +158,8 @@ def main(args):
         pin_memory=args.pin_mem,
         drop_last=True,
     )
-    
+    # from transformers import AutoImageProcessor, AutoModelForPreTraining
+    # model = AutoModelForPreTraining.from_pretrained("facebook/vit-mae-base")
     # define the model
     model = models_mae.__dict__[args.model](norm_pix_loss=args.norm_pix_loss)
 

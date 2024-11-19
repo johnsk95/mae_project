@@ -40,7 +40,7 @@ class CocoStuffDataset(Dataset):
             image = self.transform(image)
         # print('target shape: ', torch.tensor(label).shape)
         # return image, torch.tensor(label), torch.argmax(torch.tensor(label), dim=0)  # Convert one-hot to class index
-        return image, torch.tensor(label)  # Convert one-hot to class index
+        return image, torch.tensor(label.clone().detach())  # Convert one-hot to class index
 
 
 def build_dataset(is_train, args):
@@ -57,18 +57,23 @@ def build_transform(is_train, args):
     # train transform
     if is_train:
         # this should always dispatch to transforms_imagenet_train
-        transform = create_transform(
-            input_size=args.input_size,
-            is_training=True,
-            color_jitter=args.color_jitter,
-            auto_augment=args.aa,
-            interpolation='bicubic',
-            re_prob=args.reprob,
-            re_mode=args.remode,
-            re_count=args.recount,
-            mean=mean,
-            std=std,
-        )
+        # transform = create_transform(
+        #     input_size=args.input_size,
+        #     is_training=True,
+        #     # color_jitter=args.color_jitter,
+        #     # auto_augment=args.aa,
+        #     interpolation='bicubic',
+        #     # re_prob=args.reprob,
+        #     # re_mode=args.remode,
+        #     # re_count=args.recount,
+        #     mean=mean,
+        #     std=std,
+        # )
+        transform = transforms.Compose([
+            transforms.RandomResizedCrop(args.input_size, scale=(0.2, 1.0), interpolation=3),  # 3 is bicubic
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
         return transform
 
     # eval transform

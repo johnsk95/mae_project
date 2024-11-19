@@ -10,7 +10,7 @@ parser.add_argument('--cocostuff_annotations', type=str, default='Data/cocostuff
 # parser.add_argument('--coco2014_images', type=str, default='Data/Coco/2014data')
 parser.add_argument('--coco2014_images', type=str, default='Data/Coco')
 parser.add_argument('--labels_val', type=str, default='COCOStuff/labels_test.pkl')
-parser.add_argument('--labels_train', type=str, default='COCOStuff/labels_train.pkl')
+parser.add_argument('--labels_train', type=str, default='COCOStuff/labels_train_cooccur.pkl')
 parser.add_argument('--biased_classes', type=str, default='COCOStuff/biased_classes.pkl')
 parser.add_argument('--biased_classes_mapped', type=str, default='COCOStuff/biased_classes_mapped.pkl')
 parser.add_argument('--unbiased_classes_mapped', type=str, default='COCOStuff/unbiased_classes_mapped.pkl')
@@ -53,6 +53,9 @@ train = sorted(glob.glob('{}/train2014/*.jpg'.format(arg['coco2014_images'])))
 print('anno_train {}, anno_val {}, train {}, val {}\n'.format(len(anno_train), len(anno_val), len(train), len(val)))
 
 start_time = time.time()
+
+with open('COCOStuff/biased_classes_mapped.pkl', 'rb') as f:
+    biased = pickle.load(f)  
 
 # Process COCO-2014 validation set labels:
 # 1. Remove class 'unlabeled'
@@ -143,7 +146,15 @@ if True:
         label = [humanlabels_to_onehot[s] for s in label] # Map labels to [0-170]
         label_onehot = torch.nn.functional.one_hot(torch.LongTensor(label), num_classes=171)
         label_onehot = label_onehot.sum(dim=0).float()
-        labels[file] = label_onehot # Save the one-hot encoded label
+
+        cooccur = [0,0]
+        for k,v in biased.items():
+            if label_onehot[k] and label_onehot[v]:
+                cooccur = [k, v]
+                break
+
+        # labels[file] = label_onehot # Save the one-hot encoded label
+        labels[file] = (label_onehot, cooccur) # Save the one-hot encoded label and co-occurrence - John
 
         count += 1
         if count%1000 == 0:
@@ -154,34 +165,34 @@ if True:
         pickle.dump(labels, handle)
 
 # 20 most biased classes identified in the original paper
-biased_classes = {}
-biased_classes['cup'] = 'dining table'
-biased_classes['wine glass'] = 'person'
-biased_classes['handbag'] = 'person'
-biased_classes['apple'] = 'fruit'
-biased_classes['car'] = 'road'
-biased_classes['bus'] = 'road'
-biased_classes['potted plant'] = 'vase'
-biased_classes['spoon'] = 'bowl'
-biased_classes['microwave'] = 'oven'
-biased_classes['keyboard'] = 'mouse'
-biased_classes['skis'] = 'person'
-biased_classes['clock'] = 'building-other'
-biased_classes['sports ball'] = 'person'
-biased_classes['remote'] = 'person'
-biased_classes['snowboard'] = 'person'
-biased_classes['toaster'] = 'ceiling-other'
-biased_classes['hair drier'] = 'towel'
-biased_classes['tennis racket'] = 'person'
-biased_classes['skateboard'] = 'person'
-biased_classes['baseball glove'] = 'person'
-with open(arg['biased_classes'], 'wb+') as handle:
-    pickle.dump(biased_classes, handle)
+# biased_classes = {}
+# biased_classes['cup'] = 'dining table'
+# biased_classes['wine glass'] = 'person'
+# biased_classes['handbag'] = 'person'
+# biased_classes['apple'] = 'fruit'
+# biased_classes['car'] = 'road'
+# biased_classes['bus'] = 'road'
+# biased_classes['potted plant'] = 'vase'
+# biased_classes['spoon'] = 'bowl'
+# biased_classes['microwave'] = 'oven'
+# biased_classes['keyboard'] = 'mouse'
+# biased_classes['skis'] = 'person'
+# biased_classes['clock'] = 'building-other'
+# biased_classes['sports ball'] = 'person'
+# biased_classes['remote'] = 'person'
+# biased_classes['snowboard'] = 'person'
+# biased_classes['toaster'] = 'ceiling-other'
+# biased_classes['hair drier'] = 'towel'
+# biased_classes['tennis racket'] = 'person'
+# biased_classes['skateboard'] = 'person'
+# biased_classes['baseball glove'] = 'person'
+# with open(arg['biased_classes'], 'wb+') as handle:
+#     pickle.dump(biased_classes, handle)
 
-biased_classes_mapped = dict((humanlabels_to_onehot[key], humanlabels_to_onehot[value]) for (key, value) in biased_classes.items())
-with open(arg['biased_classes_mapped'], 'wb+') as handle:
-    pickle.dump(biased_classes_mapped, handle)
+# biased_classes_mapped = dict((humanlabels_to_onehot[key], humanlabels_to_onehot[value]) for (key, value) in biased_classes.items())
+# with open(arg['biased_classes_mapped'], 'wb+') as handle:
+#     pickle.dump(biased_classes_mapped, handle)
 
-unbiased_classes_mapped = [i for i in list(np.arange(80)) if i not in biased_classes_mapped.keys()]
-with open(arg['unbiased_classes_mapped'], 'wb+') as handle:
-    pickle.dump(unbiased_classes_mapped, handle)
+# unbiased_classes_mapped = [i for i in list(np.arange(80)) if i not in biased_classes_mapped.keys()]
+# with open(arg['unbiased_classes_mapped'], 'wb+') as handle:
+#     pickle.dump(unbiased_classes_mapped, handle)
