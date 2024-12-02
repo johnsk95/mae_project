@@ -2,6 +2,7 @@ import pickle, time, glob, argparse
 import torch
 import numpy as np
 from PIL import Image
+import shutil
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--labels', type=str, default='labels_txt')
@@ -36,9 +37,9 @@ print('171 labels: ', len(humanlabels_171))
 humanlabels_to_onehot = {}
 for i in range(171):
     humanlabels_to_onehot[humanlabels_171[i]] = i
-with open(arg['humanlabels_to_onehot'], 'wb+') as handle:
-    pickle.dump(humanlabels_to_onehot, handle)
-print('Saved humanlabels_to_onehot.pkl')
+# with open(arg['humanlabels_to_onehot'], 'wb+') as handle:
+#     pickle.dump(humanlabels_to_onehot, handle)
+# print('Saved humanlabels_to_onehot.pkl')
 
 # Create a list of annotation file names
 anno_val = sorted(glob.glob('{}/val2017/*.png'.format(arg['cocostuff_annotations'])))
@@ -137,6 +138,12 @@ if True:
 
         # Process the COCO-2017 things+stuff annotations
         label = list(np.unique(np.array(anno_image)).astype(np.int16))
+
+        if 40 in label:
+            print('skateboard!')
+            shutil.copyfile(file, f'skateboard/{file.split("/")[-1]}')
+            anno_image.save(f"skateboard/annotation_{file.split('/')[-1]}")
+
         if 255 in label:
        	    label.remove(255) # Remove class 'unlabeled'
         # if 0 in label:
@@ -161,8 +168,8 @@ if True:
             print(count, time.time()-start_time)
 
     print('Finished processing {} train labels'.format(len(labels)))
-    with open(arg['labels_train'], 'wb+') as handle:
-        pickle.dump(labels, handle)
+    # with open(arg['labels_train'], 'wb+') as handle:
+    #     pickle.dump(labels, handle)
 
 # 20 most biased classes identified in the original paper
 # biased_classes = {}

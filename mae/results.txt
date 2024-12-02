@@ -1,0 +1,179 @@
+mae, coco finetuned on IMAGENET, 50 epochs
+[20:15:17.965249] * mAP 0.486 Top-3 Recall 0.000 loss 0.087
+[20:15:17.977916]        cup - dining table: exclusive 24.18, co-occur 47.34
+[20:15:17.989026] wine glass -     person: exclusive 46.63, co-occur 33.38
+[20:15:18.000739]    handbag -     person: exclusive  7.03, co-occur 17.59
+[20:15:18.012488]      apple -      fruit: exclusive 26.35, co-occur 50.69
+[20:15:18.025043]        car -       road: exclusive 32.28, co-occur 72.37
+[20:15:18.037108]        bus -       road: exclusive 43.72, co-occur 82.81
+[20:15:18.049741] potted plant -       vase: exclusive 32.10, co-occur 42.71
+[20:15:18.061987]      spoon -       bowl: exclusive 12.77, co-occur 21.58
+[20:15:18.073117]  microwave -       oven: exclusive 43.96, co-occur 49.33
+[20:15:18.083734]   keyboard -      mouse: exclusive 47.20, co-occur 81.10
+[20:15:18.095874]       skis -     person: exclusive 27.72, co-occur 88.46
+[20:15:18.108521]      clock - building-other: exclusive 45.10, co-occur 84.57
+[20:15:18.119784] sports ball -     person: exclusive 19.93, co-occur 63.12
+[20:15:18.130413]     remote -     person: exclusive 28.49, co-occur 49.06
+[20:15:18.139651]  snowboard -     person: exclusive 25.75, co-occur 73.38
+[20:15:18.149256]    toaster - ceiling-other: exclusive  7.99, co-occur  2.14
+[20:15:18.159077] hair drier -      towel: exclusive  6.36, co-occur  2.59
+[20:15:18.169093] tennis racket -     person: exclusive 65.82, co-occur 96.73
+[20:15:18.178521] skateboard -     person: exclusive 51.98, co-occur 89.75
+[20:15:18.187932] baseball glove -     person: exclusive 43.74, co-occur 88.72
+[20:15:18.187997] 
+Mean: exclusive 31.96, co-occur 56.87
+
+30 epochs
+20:27:30.692695] * mAP 0.512 Top-3 Recall 0.000 loss 0.080
+[20:27:30.706446]        cup - dining table: exclusive 26.36, co-occur 51.76
+[20:27:30.717363] wine glass -     person: exclusive 50.39, co-occur 38.38
+[20:27:30.729267]    handbag -     person: exclusive 11.35, co-occur 17.78
+[20:27:30.740445]      apple -      fruit: exclusive 25.01, co-occur 50.76
+[20:27:30.753979]        car -       road: exclusive 36.64, co-occur 75.93
+[20:27:30.765718]        bus -       road: exclusive 45.67, co-occur 85.17
+[20:27:30.779308] potted plant -       vase: exclusive 36.12, co-occur 47.14
+[20:27:30.791928]      spoon -       bowl: exclusive 14.35, co-occur 25.98
+[20:27:30.803688]  microwave -       oven: exclusive 43.23, co-occur 47.96
+[20:27:30.815741]   keyboard -      mouse: exclusive 48.25, co-occur 82.09
+[20:27:30.827028]       skis -     person: exclusive 39.86, co-occur 86.10
+[20:27:30.839692]      clock - building-other: exclusive 50.31, co-occur 85.52
+[20:27:30.851397] sports ball -     person: exclusive 18.82, co-occur 60.92
+[20:27:30.862836]     remote -     person: exclusive 32.14, co-occur 56.28
+[20:27:30.873436]  snowboard -     person: exclusive 53.94, co-occur 72.62
+[20:27:30.884535]    toaster - ceiling-other: exclusive  6.90, co-occur  2.95
+[20:27:30.894876] hair drier -      towel: exclusive  8.14, co-occur  2.03
+[20:27:30.906491] tennis racket -     person: exclusive 68.05, co-occur 97.38
+[20:27:30.917806] skateboard -     person: exclusive 57.18, co-occur 92.57
+[20:27:30.928548] baseball glove -     person: exclusive 43.58, co-occur 88.96
+[20:27:30.928633] 
+Mean: exclusive 35.81, co-occur 58.41
+
+mae, further pre-trained on coco, finetuned on coco
+[19:37:43.143670] Test: Total time: 0:01:47 (0.1693 s / it)
+[19:37:44.475727] * mAP 0.391 Top-3 Recall 0.000 loss 0.181
+[19:37:44.487456]        cup - dining table: exclusive 16.26, co-occur 36.12
+[19:37:44.497154] wine glass -     person: exclusive 29.88, co-occur 25.44
+[19:37:44.506627]    handbag -     person: exclusive  4.99, co-occur 11.00
+[19:37:44.515733]      apple -      fruit: exclusive 14.07, co-occur 39.98
+[19:37:44.525497]        car -       road: exclusive 24.50, co-occur 58.53
+[19:37:44.535916]        bus -       road: exclusive 35.03, co-occur 70.85
+[19:37:44.546208] potted plant -       vase: exclusive 18.45, co-occur 23.21
+[19:37:44.556424]      spoon -       bowl: exclusive  8.33, co-occur 13.06
+[19:37:44.565986]  microwave -       oven: exclusive 33.17, co-occur 29.60
+[19:37:44.575378]   keyboard -      mouse: exclusive 31.67, co-occur 64.49
+[19:37:44.585638]       skis -     person: exclusive 15.69, co-occur 71.02
+[19:37:44.595822]      clock - building-other: exclusive 37.80, co-occur 77.48
+[19:37:44.606133] sports ball -     person: exclusive  5.53, co-occur 45.64
+[19:37:44.616547]     remote -     person: exclusive 15.43, co-occur 45.00
+[19:37:44.626561]  snowboard -     person: exclusive  6.54, co-occur 43.53
+[19:37:44.636587]    toaster - ceiling-other: exclusive  4.42, co-occur  0.16
+[19:37:44.646433] hair drier -      towel: exclusive  0.59, co-occur  0.13
+[19:37:44.656751] tennis racket -     person: exclusive 49.48, co-occur 91.13
+[19:37:44.667096] skateboard -     person: exclusive 17.01, co-occur 75.63
+[19:37:44.677505] baseball glove -     person: exclusive 40.63, co-occur 76.95
+[19:37:44.677587] 
+Mean: exclusive 20.47, co-occur 44.95
+
+20 epochs
+[19:45:20.800647] * mAP 0.492 Top-3 Recall 0.000 loss 0.084
+[19:45:20.814402]        cup - dining table: exclusive 24.22, co-occur 48.14
+[19:45:20.825671] wine glass -     person: exclusive 44.50, co-occur 29.69
+[19:45:20.838054]    handbag -     person: exclusive  8.66, co-occur 17.04
+[19:45:20.850108]      apple -      fruit: exclusive 24.67, co-occur 53.98
+[19:45:20.863083]        car -       road: exclusive 34.56, co-occur 72.73
+[19:45:20.874618]        bus -       road: exclusive 43.59, co-occur 82.97
+[19:45:20.887998] potted plant -       vase: exclusive 34.00, co-occur 44.91
+[19:45:20.899204]      spoon -       bowl: exclusive 13.42, co-occur 21.51
+[19:45:20.909751]  microwave -       oven: exclusive 38.48, co-occur 46.67
+[19:45:20.919753]   keyboard -      mouse: exclusive 43.84, co-occur 78.21
+[19:45:20.930680]       skis -     person: exclusive 17.34, co-occur 81.55
+[19:45:20.943540]      clock - building-other: exclusive 47.47, co-occur 84.48
+[19:45:20.956568] sports ball -     person: exclusive 11.61, co-occur 61.38
+[19:45:20.968966]     remote -     person: exclusive 28.77, co-occur 50.81
+[19:45:20.980724]  snowboard -     person: exclusive 16.74, co-occur 59.25
+[19:45:20.992640]    toaster - ceiling-other: exclusive  5.30, co-occur  2.35
+[19:45:21.004278] hair drier -      towel: exclusive  1.33, co-occur  1.46
+[19:45:21.015785] tennis racket -     person: exclusive 66.38, co-occur 96.56
+[19:45:21.026251] skateboard -     person: exclusive 53.04, co-occur 89.73
+[19:45:21.036040] baseball glove -     person: exclusive 39.45, co-occur 88.76
+[19:45:21.036092] 
+Mean: exclusive 29.87, co-occur 55.61
+
+15 epochs
+[20:35:11.844396] * mAP 0.503 Top-3 Recall 0.000 loss 0.082
+[20:35:11.858871]        cup - dining table: exclusive 23.55, co-occur 48.49
+[20:35:11.871051] wine glass -     person: exclusive 44.14, co-occur 24.97
+[20:35:11.884030]    handbag -     person: exclusive 10.19, co-occur 21.34
+[20:35:11.896757]      apple -      fruit: exclusive 23.42, co-occur 52.36
+[20:35:11.910039]        car -       road: exclusive 34.69, co-occur 73.24
+[20:35:11.923050]        bus -       road: exclusive 40.95, co-occur 82.64
+[20:35:11.935333] potted plant -       vase: exclusive 34.01, co-occur 46.09
+[20:35:11.946773]      spoon -       bowl: exclusive 12.06, co-occur 24.81
+[20:35:11.957975]  microwave -       oven: exclusive 36.85, co-occur 42.45
+[20:35:11.968404]   keyboard -      mouse: exclusive 43.54, co-occur 78.46
+[20:35:11.979509]       skis -     person: exclusive 24.84, co-occur 81.25
+[20:35:11.992565]      clock - building-other: exclusive 48.83, co-occur 83.23
+[20:35:12.005201] sports ball -     person: exclusive 15.65, co-occur 58.25
+[20:35:12.018145]     remote -     person: exclusive 29.06, co-occur 38.51
+[20:35:12.030631]  snowboard -     person: exclusive 22.71, co-occur 52.03
+[20:35:12.043412]    toaster - ceiling-other: exclusive  5.02, co-occur  3.95
+[20:35:12.055225] hair drier -      towel: exclusive  1.12, co-occur  1.77
+[20:35:12.066492] tennis racket -     person: exclusive 70.07, co-occur 97.29
+[20:35:12.077105] skateboard -     person: exclusive 58.76, co-occur 89.00
+[20:35:12.087416] baseball glove -     person: exclusive 38.37, co-occur 90.13
+[20:35:12.087472] 
+Mean: exclusive 30.89, co-occur 54.51
+
+
+mae, pre, fine, object masking
+20 epochs
+[23:16:12.559371] * mAP 0.392 Top-3 Recall 0.000 loss 0.094
+[23:16:12.578646]        cup - dining table: exclusive 16.05, co-occur 32.90
+[23:16:12.593200] wine glass -     person: exclusive 15.22, co-occur  7.19
+[23:16:12.607353]    handbag -     person: exclusive  5.38, co-occur 13.89
+[23:16:12.621562]      apple -      fruit: exclusive 10.26, co-occur 36.82
+[23:16:12.635228]        car -       road: exclusive 18.85, co-occur 57.96
+[23:16:12.648272]        bus -       road: exclusive 26.08, co-occur 71.66
+[23:16:12.661354] potted plant -       vase: exclusive 17.49, co-occur 33.37
+[23:16:12.674084]      spoon -       bowl: exclusive  8.65, co-occur 16.68
+[23:16:12.686918]  microwave -       oven: exclusive 19.29, co-occur 36.46
+[23:16:12.699008]   keyboard -      mouse: exclusive 24.80, co-occur 61.86
+[23:16:12.711978]       skis -     person: exclusive  6.48, co-occur 69.53
+[23:16:12.726257]      clock - building-other: exclusive 33.68, co-occur 71.88
+[23:16:12.740561] sports ball -     person: exclusive  3.86, co-occur 21.98
+[23:16:12.754221]     remote -     person: exclusive 12.96, co-occur 10.51
+[23:16:12.767982]  snowboard -     person: exclusive 11.82, co-occur 28.05
+[23:16:12.780137]    toaster - ceiling-other: exclusive  5.30, co-occur  3.01
+[23:16:12.793228] hair drier -      towel: exclusive  0.81, co-occur  0.99
+[23:16:12.805534] tennis racket -     person: exclusive 29.88, co-occur 87.75
+[23:16:12.817394] skateboard -     person: exclusive  1.62, co-occur 67.83
+[23:16:12.828908] baseball glove -     person: exclusive  0.31, co-occur 70.96
+[23:16:12.828979] 
+Mean: exclusive 13.44, co-occur 40.06
+
+epoch 50 - Mean: exclusive 15.21, co-occur 39.03
+
+epoch 30
+[23:22:12.691240] * mAP 0.399 Top-3 Recall 0.000 loss 0.094
+[23:22:12.710829]        cup - dining table: exclusive 17.14, co-occur 33.90
+[23:22:12.727300] wine glass -     person: exclusive 19.75, co-occur 11.29
+[23:22:12.742964]    handbag -     person: exclusive  6.17, co-occur 12.33
+[23:22:12.758805]      apple -      fruit: exclusive 11.79, co-occur 41.90
+[23:22:12.774602]        car -       road: exclusive 17.95, co-occur 58.84
+[23:22:12.789534]        bus -       road: exclusive 28.45, co-occur 72.65
+[23:22:12.805754] potted plant -       vase: exclusive 22.93, co-occur 31.95
+[23:22:12.819744]      spoon -       bowl: exclusive  9.24, co-occur 15.07
+[23:22:12.836071]  microwave -       oven: exclusive 21.12, co-occur 30.17
+[23:22:12.855334]   keyboard -      mouse: exclusive 27.10, co-occur 68.22
+[23:22:12.869851]       skis -     person: exclusive 14.61, co-occur 59.11
+[23:22:12.885520]      clock - building-other: exclusive 36.26, co-occur 76.29
+[23:22:12.901322] sports ball -     person: exclusive  6.43, co-occur 19.28
+[23:22:12.921517]     remote -     person: exclusive 13.69, co-occur 24.73
+[23:22:12.944032]  snowboard -     person: exclusive 18.28, co-occur 31.09
+[23:22:12.963911]    toaster - ceiling-other: exclusive  4.71, co-occur  1.98
+[23:22:12.984513] hair drier -      towel: exclusive  0.79, co-occur  1.08
+[23:22:13.005819] tennis racket -     person: exclusive 39.76, co-occur 89.02
+[23:22:13.025773] skateboard -     person: exclusive  1.55, co-occur 70.60
+[23:22:13.047472] baseball glove -     person: exclusive  0.73, co-occur 75.99
+[23:22:13.047574] 
+Mean: exclusive 15.92, co-occur 41.28

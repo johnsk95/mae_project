@@ -81,9 +81,9 @@ def get_args_parser():
     parser.add_argument('--data_path', default='../ContextualBias/COCOStuff', type=str,
                         help='dataset path')
 
-    parser.add_argument('--output_dir', default='./pretrain_coco',
+    parser.add_argument('--output_dir', default='./pretrain_coco_object_masking_p1',
                         help='path where to save, empty for no saving')
-    parser.add_argument('--log_dir', default='./pretrain_coco',
+    parser.add_argument('--log_dir', default='./pretrain_coco_object_masking_p1',
                         help='path where to tensorboard log')
     parser.add_argument('--device', default='cuda',
                         help='device to use for training / testing')

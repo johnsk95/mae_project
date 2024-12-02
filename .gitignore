@@ -12,3 +12,5 @@ ContextualBias/__pycache__
 *.pkl
 ContextualBias/models/
 .vscode/
+ContextualBias/skateboard/
+events.out.tfevents.*

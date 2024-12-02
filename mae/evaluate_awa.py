@@ -120,9 +120,9 @@ def get_args_parser():
                         help='Use class token instead of global pool for classification')
 
     # Dataset parameters
-    parser.add_argument('--data_path', default='../ContextualBias/COCOStuff', type=str,
+    parser.add_argument('--data_path', default='../ContextualBias/AwA', type=str,
                         help='dataset path')
-    parser.add_argument('--nb_classes', default=171, type=int,
+    parser.add_argument('--nb_classes', default=85, type=int,
                         help='number of the classification types')
 
     parser.add_argument('--output_dir', default='./output_dir',
@@ -308,7 +308,7 @@ def main(args):
         onehot_to_humanlabels = dict((y,x) for x,y in humanlabels_to_onehot.items())
         biased_classes_mapped = pickle.load(open('../ContextualBias/AwA/biased_classes_mapped.pkl', 'rb'))
         test_stats, labels_list, scores_list, labels_list_raw = evaluate(data_loader_val, model, device)
-        print(f"Accuracy of the network on the {len(dataset_val)} test images: {test_stats['acc1']:.1f}%")
+        # print(f"Accuracy of the network on the {len(dataset_val)} test images: {test_stats['acc1']:.1f}%")
 
         # print('labels_list shape: ', labels_list.shape) # (6985,)
         # print('labels_list shape: ', labels_list_raw.shape) # (6985,85)

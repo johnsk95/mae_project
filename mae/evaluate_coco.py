@@ -304,11 +304,11 @@ def main(args):
     misc.load_model(args=args, model_without_ddp=model_without_ddp, optimizer=optimizer, loss_scaler=loss_scaler)
 
     if args.eval:
-        humanlabels_to_onehot = pickle.load(open('../ContextualBias/AwA/humanlabels_to_onehot.pkl', 'rb'))
+        humanlabels_to_onehot = pickle.load(open('../ContextualBias/COCOStuff/humanlabels_to_onehot.pkl', 'rb'))
         onehot_to_humanlabels = dict((y,x) for x,y in humanlabels_to_onehot.items())
-        biased_classes_mapped = pickle.load(open('../ContextualBias/AwA/biased_classes_mapped.pkl', 'rb'))
-        test_stats, labels_list, scores_list, labels_list_raw = evaluate(data_loader_val, model, device)
-        print(f"Accuracy of the network on the {len(dataset_val)} test images: {test_stats['acc1']:.1f}%")
+        biased_classes_mapped = pickle.load(open('../ContextualBias/COCOStuff/biased_classes_mapped.pkl', 'rb'))
+        test_stats, labels_list, scores_list = evaluate(data_loader_val, model, device)
+        # print(f"Accuracy of the network on the {len(dataset_val)} test images: {test_stats['acc1']:.1f}%")
 
         # print('labels_list shape: ', labels_list.shape) # (6985,)
         # print('labels_list shape: ', labels_list_raw.shape) # (6985,85)
@@ -323,8 +323,8 @@ def main(args):
             b = biased_classes_list[k]
             c = biased_classes_mapped[b]
 
-            cooccur = (labels_list_raw[:,b]==1) & (labels_list_raw[:,c]==1)
-            exclusive = (labels_list_raw[:,b]==1) & (labels_list_raw[:,c]==0)
+            cooccur = (labels_list[:,b]==1) & (labels_list[:,c]==1)
+            exclusive = (labels_list[:,b]==1) & (labels_list[:,c]==0)
             other = (~exclusive) & (~cooccur)
 
             # print('co-occur: ', labels_list_raw[cooccur+other, b].shape)
@@ -333,8 +333,8 @@ def main(args):
             # exclusive_AP = recall3(labels_list_raw[exclusive+other, b], scores_list[exclusive+other], b)
 
             # mAP
-            cooccur_AP = average_precision_score(labels_list_raw[cooccur+other, b],scores_list[cooccur+other, b])
-            exclusive_AP = average_precision_score(labels_list_raw[exclusive+other, b],scores_list[exclusive+other, b])
+            cooccur_AP = average_precision_score(labels_list[cooccur+other, b],scores_list[cooccur+other, b])
+            exclusive_AP = average_precision_score(labels_list[exclusive+other, b],scores_list[exclusive+other, b])
             
             cooccur_AP_list.append(cooccur_AP)
             exclusive_AP_list.append(exclusive_AP)

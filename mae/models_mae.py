@@ -10,10 +10,12 @@
 # --------------------------------------------------------
 
 from functools import partial
+import math
 
 import torch
 import torch.nn as nn
 import random
+import torch.nn.functional as F
 
 from timm.models.vision_transformer import PatchEmbed, Block
 
@@ -63,6 +65,9 @@ class MaskedAutoencoderViT(nn.Module):
         self.norm_pix_loss = norm_pix_loss
 
         self.initialize_weights()
+
+        with open('/data/john/mae_project/mae/mapping.pkl', 'rb') as f:
+            self.mapping = pickle.load(f)
 
         # get object pairs - John
         # with open('../ContextualBias/COCOStuff/object_pairs.pkl', 'rb') as f:
@@ -156,39 +161,90 @@ class MaskedAutoencoderViT(nn.Module):
 
     def object_masking(self, x, imgs_mask, co_occur, mask_ratio):
         """
-        Perform per-sample random masking by per-sample shuffling.
-        Per-sample shuffling is done by argsort random noise.
+        Perform masking based on co-occurrence information
         x: [N, L, D], sequence
+        imgs_mask: [N, H, W] coco-stuff annotation image
+        co_occur: [N, 2] co-occurring object indices
         """
         N, L, D = x.shape  # batch, length, dim
         len_keep = int(L * (1 - mask_ratio))
-        print(imgs_mask.shape)
-
-        # go through co_occur
-        for i in co_occur:
-            if i.any():
-                # custom masking
-                pass
-            else:
-                # random masking
-                pass
         
-        noise = torch.rand(N, L, device=x.device)  # noise in [0, 1]
+        # Initialize mask tensor
+        mask = torch.zeros(N, L, device=x.device)  # 1 is remove, 0 is keep, (Batchsize, #patches)
+        ids_restore = torch.arange(L, device=x.device).unsqueeze(0).repeat(N, 1)
         
-        # sort noise for each sample
-        ids_shuffle = torch.argsort(noise, dim=1)  # ascend: small is keep, large is remove
-        ids_restore = torch.argsort(ids_shuffle, dim=1)
+        # Process each sample in batch
+        for i in range(N):
+            # print('sample: ', co_occur[i])
+            if co_occur[i].any():  # If there are co-occurring objects
+                # Randomly choose one of the two objects
+                obj_idx = co_occur[i][torch.randint(0, 2, (1,))]
+                # obj_idx = co_occur[i][1] # select co-occurring object to mask
+                # obj_idx = co_occur[i][0] # select main object to mask
+                # print('object selected: ', obj_idx)
+                obj_idx = self.mapping[obj_idx.item()]  # Map to COCOStuff label
+                
+                # Get object mask from annotation
+                # obj_mask = (imgs_mask[i] == obj_idx).float() # [1,224,224]
+                obj_mask = (imgs_mask[i] == obj_idx-1).float() # [1,224,224]
 
-        # keep the first subset
-        ids_keep = ids_shuffle[:, :len_keep]
-        x_masked = torch.gather(x, dim=1, index=ids_keep.unsqueeze(-1).repeat(1, 1, D))
 
-        # generate the binary mask: 0 is keep, 1 is remove
-        mask = torch.ones([N, L], device=x.device)
-        mask[:, :len_keep] = 0
-        # unshuffle to get the binary mask
-        mask = torch.gather(mask, dim=1, index=ids_restore)
+                # Add batch and channel dimensions for interpolation
+                obj_mask = obj_mask.unsqueeze(0)  # [1, 1, 224, 224]
 
+                # Resize object mask to patch size (14x14 for ViT)
+                H = W = int(math.sqrt(L))
+                obj_mask = torch.nn.functional.interpolate(
+                    obj_mask,
+                    size=(H, W),
+                    mode='bilinear'
+                ).squeeze()
+
+                # Ensure that any patch with partial true values is selected
+                # print('mask: ', obj_mask)
+                obj_mask = (obj_mask > 0).float()
+                
+                # Convert to patch indices
+                obj_patches = obj_mask.flatten()
+                
+                # Count object patches
+                n_obj_patches = int(obj_patches.sum().item())
+                
+                # Fill mask with object patches
+                mask[i] = obj_patches
+                
+                # If we need more masked patches to meet mask_ratio
+                remaining_masks = L - len_keep - n_obj_patches
+                if remaining_masks > 0:
+                    # Create noise for remaining positions
+                    noise = torch.rand(L, device=x.device)
+                    # Zero out already masked positions
+                    noise[obj_patches > 0] = -1
+                    
+                    # Sort and get additional masks
+                    _, ids_shuffle = torch.sort(noise, descending=True)
+                    additional_masks = ids_shuffle[:remaining_masks]
+                    mask[i][additional_masks] = 1
+                    
+            else:  # Random masking
+                # print('random masking')
+                noise = torch.rand(L, device=x.device)
+                ids_shuffle = torch.argsort(noise)
+                mask[i][ids_shuffle[len_keep:]] = 1
+        # Keep unmasked tokens for each sample in batch
+        x_masked = []
+        for i in range(N):
+            sample_mask = mask[i] == 0
+            x_masked.append(x[i][sample_mask])
+        
+        # Pad sequences to same length (len_keep)
+        x_masked = torch.stack([F.pad(x_i, (0, 0, 0, len_keep - x_i.size(0))) 
+                            for x_i in x_masked])
+
+        # Keep only unmasked tokens
+        # ids_keep = torch.nonzero(mask == 0).t()
+        # x_masked = x[ids_keep[0], ids_keep[1]] # [1568, 768]
+        
         return x_masked, mask, ids_restore
 
 
@@ -200,8 +256,7 @@ class MaskedAutoencoderViT(nn.Module):
     #     x = x + self.pos_embed[:, 1:, :]
 
     #     # masking: length -> length * mask_ratio
-    #     # x, mask, ids_restore = self.random_masking(x, mask_ratio)
-    #     x, mask, ids_restore = self.object_masking(x, mask_ratio)
+    #     x, mask, ids_restore = self.random_masking(x, mask_ratio)
 
     #     # append cls token
     #     cls_token = self.cls_token + self.pos_embed[:, :1, :]
@@ -226,10 +281,15 @@ class MaskedAutoencoderViT(nn.Module):
         # x, mask, ids_restore = self.random_masking(x, mask_ratio)
         x, mask, ids_restore = self.object_masking(x, imgs_mask, co_occur, mask_ratio)
 
+
+        # original
+        # x -> torch.Size([32, 49, 768])
+        # cls_tokens -> torch.Size([32, 1, 768])
         # append cls token
         cls_token = self.cls_token + self.pos_embed[:, :1, :]
         cls_tokens = cls_token.expand(x.shape[0], -1, -1)
-        x = torch.cat((cls_tokens, x), dim=1)
+        x = torch.cat((cls_tokens, x), dim=1) # torch.Size([32, 50, 768])
+        # x = torch.cat((cls_tokens, x.unsqueeze(1)), dim=1)
 
         # apply Transformer blocks
         for blk in self.blocks:

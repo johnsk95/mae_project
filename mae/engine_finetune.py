@@ -166,8 +166,8 @@ def evaluate(data_loader, model, device):
         # target = target.to(device, non_blocking=True, dtype=torch.long)
 
         # John: non-one-hot binary labels
-        target_raw = batch[1]
-        target_raw = target_raw.to(device, non_blocking=True)
+        # target_raw = batch[1]
+        # target_raw = target_raw.to(device, non_blocking=True)
 
         # compute output
         with torch.cuda.amp.autocast():
@@ -206,7 +206,6 @@ def evaluate(data_loader, model, device):
 
     # Calculate mean average precision and top-3 recall
     all_targets = np.array(all_targets)
-    all_targets_raw = np.array(all_targets_raw)
     # print('targets shape: ', all_targets.shape) # targets shape:  (6985,)
     all_outputs = np.array(all_outputs)
     # print('output shape: ', all_outputs.shape) # output shape:  (6985, 85)
@@ -219,4 +218,4 @@ def evaluate(data_loader, model, device):
     # print('* Acc@1 {top1.global_avg:.3f} Acc@5 {top5.global_avg:.3f} Top-3 Recall {top3_recall:.3f} loss {losses.global_avg:.3f}'
     #       .format(top1=metric_logger.acc1, top5=metric_logger.acc5, top3_recall=top3_recall, losses=metric_logger.loss))
 
-    return {k: meter.global_avg for k, meter in metric_logger.meters.items()}, all_targets, all_outputs, all_targets_raw
+    return {k: meter.global_avg for k, meter in metric_logger.meters.items()}, all_targets, all_outputs
